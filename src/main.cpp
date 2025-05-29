@@ -1,5 +1,6 @@
 #include "Arduino.h"
 #include "Vrekrer_scpi_parser.h"
+#include "Analog.h"
 
 SCPI_Parser scpi;
 
@@ -12,34 +13,35 @@ void Identify(SCPI_C commands, SCPI_P parameters, Stream& interface)
 
 void Measure(SCPI_C commands, SCPI_P parameters, Stream& interface)
 {
-	uint8_t pin;
+	Analog::ADConv::Muxer::Input pin;
 	uint16_t value;
 
 	switch(String(parameters[0]).toInt())
 	{
 	case 1:
-		pin = A0;
+		pin = Analog::ADConv::Muxer::Input::AIn0;
 		break;
 	case 2:
-		pin = A1;
+		pin = Analog::ADConv::Muxer::Input::AIn1;
 		break;
 	case 3:
-		pin = A2;
+		pin = Analog::ADConv::Muxer::Input::AIn2;
 		break;
 	case 4:
-		pin = A3;
+		pin = Analog::ADConv::Muxer::Input::AIn3;
 		break;
 	case 5:
-		pin = A4;
+		pin = Analog::ADConv::Muxer::Input::AIn4;
 		break;
 	case 6:
-		pin = A5;
+		pin = Analog::ADConv::Muxer::Input::AIn5;
 		break;
 	default:
 		return;
 	}
 
-	value = analogRead(pin);
+	Analog::ADConv::Muxer::SetInput(pin);
+	value = Analog::ADConv::InputComp();
 	interface.print(value * (0.001f * vref) / 4096, 4);
 	interface.write('\n');
 }
