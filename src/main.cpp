@@ -4,7 +4,7 @@
 
 SCPI_Parser scpi;
 
-uint16_t vcc, aref, vref;
+uint16_t vref;
 
 void Identify(SCPI_C commands, SCPI_P parameters, Stream& interface)
 {
@@ -68,27 +68,33 @@ void Reference(SCPI_C commands, SCPI_P parameters, Stream& interface)
 
 	if(ref == F("VCC"))
 	{
-		analogReference(DEFAULT);
-		vref = vcc;
+		Analog::Reference::SetSource(Analog::Reference::Source::Int1024);
+		Analog::ADConv::Divider::SetInput(Analog::ADConv::Divider::Input::Vcc);
+		Analog::ADConv::Muxer::SetInput(Analog::ADConv::Muxer::Input::Vdo15);
+		vref = (5 * Analog::ADConv::InputComp()) / 4;
+		Analog::Reference::SetSource(Analog::Reference::Source::Vcc);
 	}
 	else if(ref == F("EXT"))
 	{
-		analogReference(EXTERNAL);
-		vref = vcc; // FIXME: Measure external reference voltage.
+		Analog::Reference::SetSource(Analog::Reference::Source::Int1024);
+		Analog::ADConv::Divider::SetInput(Analog::ADConv::Divider::Input::Ext);
+		Analog::ADConv::Muxer::SetInput(Analog::ADConv::Muxer::Input::Vdo15);
+		vref = (5 * Analog::ADConv::InputComp()) / 4;
+		Analog::Reference::SetSource(Analog::Reference::Source::Vref);
 	}
 	else if(ref == F("INT1"))
 	{
-		analogReference(INTERNAL1V024);
+		Analog::Reference::SetSource(Analog::Reference::Source::Int1024);
 		vref = 1024;
 	}
 	else if(ref == F("INT2"))
 	{
-		analogReference(INTERNAL2V048);
+		Analog::Reference::SetSource(Analog::Reference::Source::Int2048);
 		vref = 2048;
 	}
 	else if(ref == F("INT4"))
 	{
-		analogReference(INTERNAL4V096);
+		Analog::Reference::SetSource(Analog::Reference::Source::Int4096);
 		vref = 4096;
 	}
 }
@@ -106,11 +112,11 @@ void setup()
 	pinMode(DAC0, ANALOG);
 	analogWrite(DAC0, 0);
 
-	analogReadResolution(12);
-
-	analogReference(INTERNAL1V024);
-	vref = vcc = (5 * analogRead(V5D1)) / 4;
-	analogReference(DEFAULT);
+	Analog::Reference::SetSource(Analog::Reference::Source::Int1024);
+	Analog::ADConv::Divider::SetInput(Analog::ADConv::Divider::Input::Vcc);
+	Analog::ADConv::Muxer::SetInput(Analog::ADConv::Muxer::Input::Vdo15);
+	vref = (5 * Analog::ADConv::InputComp()) / 4;
+	Analog::Reference::SetSource(Analog::Reference::Source::Vref);
 }
 
 void loop()
