@@ -31,7 +31,7 @@ for ref in refs:
 		v = i * 0.1 * refs[ref]
 		vals = []
 		devs = []
-		ser.write(b":SOUR:VOLT %f\n" % v)
+		ser.write(b":SOUR:VOLT %fV\n" % v)
 		ser.flush()
 		time.sleep(1)
 

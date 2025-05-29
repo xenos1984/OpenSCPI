@@ -46,7 +46,17 @@ void Measure(SCPI_C commands, SCPI_P parameters, Stream& interface)
 
 void Output(SCPI_C commands, SCPI_P parameters, Stream& interface)
 {
-	analogWrite(DAC0, constrain(256000 * String(parameters[0]).toFloat() / vref - 1, 0, 255));
+	String p0 = String(parameters[0]);
+	float val = p0.toFloat();
+
+	if(p0.endsWith(F("mV")))
+		val = 256 * val / vref - 1;
+	else if(p0.endsWith(F("V")))
+		val = 256000 * val / vref - 1;
+	else if(p0.endsWith(F("%")))
+		val = 255 * val / 100;
+
+	analogWrite(DAC0, constrain(val, 0, 255));
 }
 
 void Reference(SCPI_C commands, SCPI_P parameters, Stream& interface)
