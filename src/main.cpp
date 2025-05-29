@@ -58,7 +58,7 @@ void Output(SCPI_C commands, SCPI_P parameters, Stream& interface)
 	else if(p0.endsWith(F("%")))
 		val = 255 * val / 100;
 
-	analogWrite(DAC0, constrain(val, 0, 255));
+	Analog::DAConv::SetValue(constrain(val, 0, 255));
 }
 
 void Reference(SCPI_C commands, SCPI_P parameters, Stream& interface)
@@ -109,8 +109,9 @@ void setup()
 	scpi.RegisterCommand(F(":SOURce:VOLTage"), &Output);
 	scpi.RegisterCommand(F(":CONFigure:ANALog:VREFerence"), &Reference);
 
-	pinMode(DAC0, ANALOG);
-	analogWrite(DAC0, 0);
+	Analog::DAConv::EnableConv();
+	Analog::DAConv::EnableOutput();
+	Analog::DAConv::SetValue(0);
 
 	Analog::Reference::SetSource(Analog::Reference::Source::Int1024);
 	Analog::ADConv::Divider::SetInput(Analog::ADConv::Divider::Input::Vcc);
