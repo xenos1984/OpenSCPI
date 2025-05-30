@@ -36,7 +36,7 @@ for ref in refs:
 		time.sleep(1)
 
 		for i in range(0, 10):
-			ser.write(b":MEAS:VOLT? 1\n")
+			ser.write(b":MEAS:VOLT? A0\n")
 			ser.flush()
 			val = float(ser.readline())
 			dev = (val - v) * 100 / v

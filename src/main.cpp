@@ -13,30 +13,96 @@ void Identify(SCPI_C commands, SCPI_P parameters, Stream& interface)
 
 void Measure(SCPI_C commands, SCPI_P parameters, Stream& interface)
 {
-	Analog::ADConv::Muxer::Input pin;
+	String p0 = String(parameters[0]);
+	Analog::ADConv::Muxer::Input pin = Analog::ADConv::Muxer::Input::AGnd;
 	uint16_t value;
 
-	switch(String(parameters[0]).toInt())
+	p0.toUpperCase();
+
+	if(p0[0] == 'A' && p0.length() >= 2)
 	{
-	case 1:
-		pin = Analog::ADConv::Muxer::Input::AIn0;
-		break;
-	case 2:
-		pin = Analog::ADConv::Muxer::Input::AIn1;
-		break;
-	case 3:
-		pin = Analog::ADConv::Muxer::Input::AIn2;
-		break;
-	case 4:
-		pin = Analog::ADConv::Muxer::Input::AIn3;
-		break;
-	case 5:
-		pin = Analog::ADConv::Muxer::Input::AIn4;
-		break;
-	case 6:
-		pin = Analog::ADConv::Muxer::Input::AIn5;
-		break;
-	default:
+		int n = p0.substring(1).toInt();
+
+		if(n >= 8)
+			n++;
+
+		if(n < 0 || n >= 12)
+			return;
+
+		pin = static_cast<Analog::ADConv::Muxer::Input>(n);
+	}
+	else if(p0[0] == 'P' && p0.length() == 3)
+	{
+		int n = p0.substring(2).toInt();
+
+		if(p0[1] == 'C')
+		{
+			if(n == 7)
+				pin = Analog::ADConv::Muxer::Input::PinC7;
+			else if(n >= 0 && n <= 5)
+				pin = static_cast<Analog::ADConv::Muxer::Input>(n);
+			else
+				return;
+		}
+		else if(p0[1] == 'F' && n == 0)
+		{
+			pin = Analog::ADConv::Muxer::Input::PinF0;
+		}
+		else if(p0[1] == 'E')
+		{
+			switch(n)
+			{
+			case 1:
+				pin = Analog::ADConv::Muxer::Input::PinE1;
+				break;
+			case 3:
+				pin = Analog::ADConv::Muxer::Input::PinE3;
+				break;
+			case 6:
+				pin = Analog::ADConv::Muxer::Input::PinE6;
+				break;
+			case 7:
+				pin = Analog::ADConv::Muxer::Input::PinE7;
+				break;
+			default:
+				return;
+			}
+		}
+		else
+		{
+			return;
+		}
+	}
+	else if(p0 == F("DAC"))
+	{
+		pin = Analog::ADConv::Muxer::Input::DAOut;
+	}
+	else if(p0 == F("IVREF"))
+	{
+		pin = Analog::ADConv::Muxer::Input::IVref;
+	}
+	else if(p0 == F("VCC15"))
+	{
+		Analog::ADConv::Divider::SetInput(Analog::ADConv::Divider::Input::Vcc);
+		pin = Analog::ADConv::Muxer::Input::Vdo15;
+	}
+	else if(p0 == F("VCC45"))
+	{
+		Analog::ADConv::Divider::SetInput(Analog::ADConv::Divider::Input::Vcc);
+		pin = Analog::ADConv::Muxer::Input::Vdo45;
+	}
+	else if(p0 == F("EXT15"))
+	{
+		Analog::ADConv::Divider::SetInput(Analog::ADConv::Divider::Input::Ext);
+		pin = Analog::ADConv::Muxer::Input::Vdo15;
+	}
+	else if(p0 == F("EXT45"))
+	{
+		Analog::ADConv::Divider::SetInput(Analog::ADConv::Divider::Input::Ext);
+		pin = Analog::ADConv::Muxer::Input::Vdo45;
+	}
+	else
+	{
 		return;
 	}
 
