@@ -7,7 +7,7 @@ namespace Analog
 		void SetSource(Source ref)
 		{
 			ADMUX = (ADMUX & 0x3f) | (static_cast<uint8_t>(ref) << 6);
-			ADCSRD = (ADCSRD & 0xbf) | (static_cast<uint8_t>(ref) << 4 & 0x40);
+			ADCSRD = (ADCSRD & 0xbf) | (static_cast<uint8_t>(ref) << 4 & 0x40) | 0x80;
 
 			if(ref == Source::Vcc)
 				DACON &= 0x0c;
@@ -26,16 +26,17 @@ namespace Analog
 
 			if(ref == Source::Int1024)
 			{
+				ADCSRD |= 0x80;
 				VCAL = VCAL1;
 			}
 			else if(ref == Source::Int2048)
 			{
-				ADCSRD |= 0x10;
+				ADCSRD |= 0x90;
 				VCAL = VCAL2;
 			}
 			else
 			{
-				ADCSRD |= 0x20;
+				ADCSRD |= 0xa0;
 				VCAL = VCAL3;
 			}
 		}

@@ -127,6 +127,18 @@ void Output(SCPI_C commands, SCPI_P parameters, Stream& interface)
 	Analog::DAConv::SetValue(constrain(val, 0, 255));
 }
 
+void RefOut(SCPI_C commands, SCPI_P parameters, Stream& interface)
+{
+	String p0 = String(parameters[0]);
+
+	p0.toUpperCase();
+
+	if(p0 == F("ON") || p0 == F("TRUE") || p0 == F("1"))
+		Analog::Reference::EnableOutput();
+	else if(p0 == F("OFF") || p0 == F("FALSE") || p0 == F("0"))
+		Analog::Reference::DisableOutput();
+}
+
 void Reference(SCPI_C commands, SCPI_P parameters, Stream& interface)
 {
 	String ref = String(parameters[0]);
@@ -173,12 +185,14 @@ void setup()
 	scpi.RegisterCommand(F("*IDN?"), &Identify);
 	scpi.RegisterCommand(F(":MEASure:VOLTage?"), &Measure);
 	scpi.RegisterCommand(F(":SOURce:VOLTage"), &Output);
+	scpi.RegisterCommand(F(":SOURce:VREFerence"), &RefOut);
 	scpi.RegisterCommand(F(":CONFigure:ANALog:VREFerence"), &Reference);
 
 	Analog::DAConv::EnableConv();
 	Analog::DAConv::EnableOutput();
 	Analog::DAConv::SetValue(0);
 
+	Analog::Reference::DisableOutput();
 	Analog::Reference::SetSource(Analog::Reference::Source::Int1024);
 	Analog::ADConv::Divider::SetInput(Analog::ADConv::Divider::Input::Vcc);
 	Analog::ADConv::Muxer::SetInput(Analog::ADConv::Muxer::Input::Vdo15);
